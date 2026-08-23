@@ -40,7 +40,7 @@ Row {
         anchors.verticalCenter: parent.verticalCenter
         implicitWidth: root.size
         implicitHeight: root.size
-        radius: width / 2
+        radius: Config.rounded ? width / 2 : 0
         color: Theme.surface
 
         Image {

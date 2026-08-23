@@ -10,8 +10,12 @@ import Quickshell
 // Quickshell recharge a chaque sauvegarde, donc modifier ce fichier
 // suffit a voir le resultat, sans redemarrer la barre.
 Singleton {
-    // Bulles en capsule (arrondi complet) ou a angles vifs.
-    // Les angles vifs s'accordent avec des fenetres non arrondies,
-    // ce que sway ne sait de toute facon pas faire.
-    property bool roundedPills: true
+    // Vocabulaire de formes de tout le shell : capsules et cercles, ou
+    // angles vifs. Gouverne les bulles, les pastilles de workspace et
+    // l'avatar — l'option ne vaut que si elle est appliquee partout, sinon
+    // il reste des ronds isoles qui jurent avec le reste.
+    //
+    // Les angles vifs s'accordent avec des fenetres non arrondies, ce que
+    // sway ne sait de toute facon pas faire.
+    property bool rounded: true
 }

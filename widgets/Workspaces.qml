@@ -30,7 +30,7 @@ Row {
 
             width: 24
             height: 24
-            radius: width / 2
+            radius: Config.rounded ? width / 2 : 0
             // actif : pas de remplissage, juste le contour — sinon
             // l'aplat clair avale les icones, claires elles aussi
             color: Theme.dim
