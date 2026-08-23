@@ -32,7 +32,10 @@ Variants {
                 anchors.left: parent.left
                 anchors.verticalCenter: parent.verticalCenter
                 height: 48
-                Text { anchors.centerIn: parent; text: "gauche"; color: Theme.fg; font.family: Theme.font }
+                User {
+                    anchors.centerIn: parent
+                    size: bar.implicitHeight * 0.34
+                }
             }
 
             Pill {

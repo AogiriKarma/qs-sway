@@ -3,5 +3,6 @@ Clock 1.0 Clock.qml
 Pill 1.0 Pill.qml
 Tray 1.0 Tray.qml
 TrayMenu 1.0 TrayMenu.qml
+User 1.0 User.qml
 Volume 1.0 Volume.qml
 Workspaces 1.0 Workspaces.qml
