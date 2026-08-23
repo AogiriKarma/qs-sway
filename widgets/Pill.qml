@@ -8,7 +8,7 @@ Rectangle {
     property int padding: 14
 
     color: Theme.surface
-    radius: height / 2
+    radius: Config.roundedPills ? height / 2 : 0
     border.color: Qt.alpha(Theme.glow, 0.3)
     border.width: 1
 
