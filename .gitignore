@@ -1,0 +1,4 @@
+# logs quickshell
+*.qslog
+# dumps de debug (swaymsg -t get_tree, etc.)
+tree.json
