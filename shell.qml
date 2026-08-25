@@ -109,6 +109,7 @@ Variants {
 
                     Hoverable {
                         anchors.centerIn: parent
+                        interactive: false
 
                         User {
                             id: userWidget
@@ -222,7 +223,7 @@ Variants {
                             anchors.horizontalCenter: parent.horizontalCenter
                             y: (bar.pillThickness - statusPill.padding * 2 - height) / 2
                             spacing: 14
-                            columns: bar.vertical ? 1 : 5
+                            columns: bar.vertical ? 1 : 7
                             horizontalItemAlignment: Grid.AlignHCenter
                             verticalItemAlignment: Grid.AlignVCenter
 
@@ -267,6 +268,31 @@ Variants {
                                     id: clockWidget
                                     labelSize: bar.labelSize
                                     size: Config.barSize * 0.28
+                                }
+                            }
+
+                            // Separateur : le bouton d'alimentation n'a pas la
+                            // meme nature que ses voisins — ils informent, il
+                            // agit. Le trait dit ce qu'un simple espace ne
+                            // dirait pas, et l'eloigne de l'horloge au passage.
+                            Rectangle {
+                                implicitWidth: 1
+                                implicitHeight: Config.barSize * 0.3
+                                color: Qt.alpha(Theme.glow, 0.25)
+                                visible: !bar.vertical
+                            }
+
+                            // bouton d'alimentation : pas de widget dedie,
+                            // il n'affiche aucun etat — juste une porte
+                            // vers la page session
+                            Hoverable {
+                                onClicked: bar.panel = bar.panel === "Session" ? "" : "Session"
+
+                                Text {
+                                    text: "󰐥"
+                                    color: Theme.fg
+                                    font.family: Theme.font
+                                    font.pixelSize: Config.barSize * 0.25
                                 }
                             }
                         }

@@ -5,5 +5,6 @@ Dropdown 1.0 Dropdown.qml
 Network 1.0 Network.qml
 PanelButton 1.0 PanelButton.qml
 Scroller 1.0 Scroller.qml
+Session 1.0 Session.qml
 Slider 1.0 Slider.qml
 Volume 1.0 Volume.qml
