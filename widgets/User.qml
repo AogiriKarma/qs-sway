@@ -70,6 +70,8 @@ Row {
 
     Text {
         anchors.verticalCenter: parent.verticalCenter
+        // barre laterale : le nom ne rentre pas, l'avatar suffit
+        visible: !Config.vertical
         text: root.username
         color: Theme.fg
         font.family: Theme.font

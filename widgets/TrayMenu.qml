@@ -23,6 +23,9 @@ PopupWindow {
     // permet a une entree feuille de refermer toute la chaine
     property var parentMenu: null
 
+    // bord de l'ancre pour un menu racine : sous l'icone (barre du haut)
+    // ou a sa droite (barre laterale)
+    property int edge: Edges.Bottom
     property int padding: 6
     property int rowHeight: 26
 
@@ -59,8 +62,8 @@ PopupWindow {
     }
 
     anchor.item: root.anchorItem
-    anchor.edges: root.submenu ? Edges.Right : Edges.Bottom
-    anchor.gravity: root.submenu ? Edges.Right : Edges.Bottom
+    anchor.edges: root.submenu ? Edges.Right : root.edge
+    anchor.gravity: root.submenu ? Edges.Right : root.edge
     // Place insuffisante du cote demande : le compositeur bascule le popup
     // de l'autre cote (FlipX/FlipY) plutot que de le laisser deborder ou
     // recouvrir son parent. Slide en dernier recours, pour le cas ou aucun

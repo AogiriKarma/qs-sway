@@ -2,3 +2,6 @@
 *.qslog
 # dumps de debug (swaymsg -t get_tree, etc.)
 tree.json
+
+# preferences utilisateur : les defauts vivent dans services/Config.qml
+config.json

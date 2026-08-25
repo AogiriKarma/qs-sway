@@ -18,9 +18,21 @@ ColumnLayout {
         precision: SystemClock.Minutes
     }
 
+    // "00:49" fait environ 50 px de large : dans une barre laterale les
+    // minutes passent sous les heures, sinon l'horloge deborde de la bulle
     Text {
         Layout.alignment: Qt.AlignHCenter
-        text: Qt.locale().toString(clock.date, "HH:mm")
+        text: Qt.locale().toString(clock.date, Config.vertical ? "HH" : "HH:mm")
+        color: Theme.fg
+        font.family: Theme.fontMono
+        font.pixelSize: root.size
+        font.bold: true
+    }
+
+    Text {
+        Layout.alignment: Qt.AlignHCenter
+        visible: Config.vertical
+        text: Qt.locale().toString(clock.date, "mm")
         color: Theme.fg
         font.family: Theme.fontMono
         font.pixelSize: root.size

@@ -4,7 +4,7 @@ import Quickshell.Widgets
 import QtQuick
 import qs.services
 
-Row {
+Grid {
     id: root
 
     property int count: 10
@@ -13,6 +13,12 @@ Row {
 
     spacing: 6
     anchors.centerIn: parent
+    // une seule colonne empile, count colonnes alignent
+    columns: Config.vertical ? 1 : root.count
+    // Grid aligne ses enfants lui-meme : un ancrage sur le delegue
+    // entrerait en conflit avec son positionnement
+    horizontalItemAlignment: Grid.AlignHCenter
+    verticalItemAlignment: Grid.AlignVCenter
 
     Repeater {
         model: root.count
@@ -36,7 +42,6 @@ Row {
             color: Theme.dim
             border.color: Theme.accent
             border.width: active ? 2 : 0
-            anchors.verticalCenter: parent.verticalCenter
 
             Behavior on color { ColorAnimation { duration: 120 } }
             Behavior on border.width { NumberAnimation { duration: 120 } }

@@ -5,7 +5,7 @@ import Quickshell.I3
 import QtQuick
 import qs.services
 
-Row {
+Grid {
     id: root
 
     property int size: 18
@@ -14,6 +14,9 @@ Row {
     property var window
 
     spacing: 10
+    columns: Config.vertical ? 1 : SystemTray.items.values.length
+    horizontalItemAlignment: Grid.AlignHCenter
+    verticalItemAlignment: Grid.AlignVCenter
     // pas d'appli en tray -> pas de trou dans la bulle
     visible: SystemTray.items.values.length > 0
 
@@ -96,7 +99,6 @@ Row {
 
             implicitWidth: root.size
             implicitHeight: root.size
-            anchors.verticalCenter: parent.verticalCenter
             acceptedButtons: Qt.LeftButton | Qt.MiddleButton | Qt.RightButton
 
             function openMenu() {
@@ -119,6 +121,8 @@ Row {
                 id: itemMenu
                 menuHandle: item.modelData.menu
                 anchorItem: item
+                // barre laterale : le menu sort a droite, pas dessous
+                edge: Config.vertical ? Edges.Right : Edges.Bottom
 
                 // resynchronisation : quand sway ferme le popup (clic
                 // exterieur, perte du grab), personne ne previent le QML.
