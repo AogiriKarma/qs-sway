@@ -16,15 +16,6 @@ Row {
 
     spacing: 8
 
-    readonly property string details: root.username
-        + (hostFile.loaded ? "@" + hostFile.text().trim() : "")
-
-    FileView {
-        id: hostFile
-        path: "/etc/hostname"
-        printErrors: false
-    }
-
     // Sert uniquement a savoir si le fichier existe : une Image dont la
     // source est absente fait râler Qt dans la console. printErrors coupe
     // le bruit, watchChanges fait apparaitre l'avatar sans redemarrer.

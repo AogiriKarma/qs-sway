@@ -1,193 +1,151 @@
 import Quickshell
-import Quickshell.Io
 import Quickshell.Services.UPower
 import QtQuick
 import QtQuick.Layouts
 import qs.services
 
-// Reglages de charge. UPower ne sait que lire : les seuils et le mode de
-// charge vivent dans /sys/class/power_supply/BAT0, ecrits directement.
+// Page batterie, d'apres le schema : les trois profils d'alimentation en
+// haut, une grande jauge dessinee au milieu, l'autonomie en dessous.
 //
-// Ces fichiers appartiennent a root ; une regle udev
-// (/etc/udev/rules.d/99-thinkpad-battery.rules) en donne l'ecriture au
-// groupe de l'utilisateur. Sans elle, les boutons resteraient sans effet.
+// Les profils passent par power-profiles-daemon, expose ici par
+// PowerProfiles. L'ecriture est autorisee par polkit pour la session
+// active : rien a configurer, contrairement a un acces direct a
+// /sys/firmware/acpi/platform_profile, reserve a root.
 ColumnLayout {
     id: root
 
-    readonly property string base: "/sys/class/power_supply/BAT0/"
     readonly property var device: UPower.displayDevice
+    readonly property bool charging: root.device?.state === UPowerDeviceState.Charging
+    readonly property real percentage: root.device?.percentage ?? 0
 
-    readonly property int startThreshold: parseInt(startFile.text()) || 0
-    readonly property int endThreshold: parseInt(endFile.text()) || 100
-    // "[auto] inhibit-charge force-discharge" : le mode actif est entre crochets
-    readonly property string behaviour: {
-        const m = /\[([a-z-]+)\]/.exec(behaviourFile.text() ?? "")
-        return m ? m[1] : ""
+    // secondes -> "1h47" ; "" tant qu'UPower n'a pas de debit stable
+    function formatDuration(seconds) {
+        if (!seconds || seconds <= 0)
+            return ""
+        const h = Math.floor(seconds / 3600)
+        const m = Math.round((seconds % 3600) / 60)
+        return h > 0 ? h + "h" + String(m).padStart(2, "0") : m + " min"
     }
 
-    readonly property real health: {
-        const full = parseFloat(fullFile.text())
-        const design = parseFloat(designFile.text())
-        return design > 0 ? full / design : 0
-    }
+    readonly property string remaining: root.formatDuration(
+        root.charging ? root.device?.timeToFull : root.device?.timeToEmpty)
 
-    function write(view, value) {
-        view.setText(String(value))
-        // relecture immediate : le noyau peut refuser ou ajuster la valeur
-        // (un seuil de debut superieur au seuil de fin, par exemple)
-        refresh.restart()
-    }
+    spacing: 16
 
-    FileView { id: startFile; path: root.base + "charge_control_start_threshold"; blockLoading: true; printErrors: false }
-    FileView { id: endFile; path: root.base + "charge_control_end_threshold"; blockLoading: true; printErrors: false }
-    FileView { id: behaviourFile; path: root.base + "charge_behaviour"; blockLoading: true; printErrors: false }
-    FileView { id: fullFile; path: root.base + "energy_full"; blockLoading: true; printErrors: false }
-    FileView { id: designFile; path: root.base + "energy_full_design"; blockLoading: true; printErrors: false }
-    FileView { id: cyclesFile; path: root.base + "cycle_count"; blockLoading: true; printErrors: false }
-
-    Timer {
-        id: refresh
-        interval: 400
-        repeat: false
-        running: true
-        onTriggered: {
-            startFile.reload()
-            endFile.reload()
-            behaviourFile.reload()
-            fullFile.reload()
-            designFile.reload()
-            cyclesFile.reload()
-        }
-    }
-
-    spacing: 12
-
-    // ---------- etat
+    // ---------- profils d'alimentation
     RowLayout {
-        Layout.fillWidth: true
-        spacing: 10
-
-        Text {
-            Layout.fillWidth: true
-            text: Math.round((root.device?.percentage ?? 0) * 100) + "% — "
-                + (root.device?.state === UPowerDeviceState.Charging ? "charging" : "on battery")
-            color: Theme.fg
-            font.family: Theme.font
-            font.pixelSize: 13
-            font.bold: true
-        }
-    }
-
-    Repeater {
-        model: [
-            { key: "Health", value: Math.round(root.health * 100) + "%" },
-            { key: "Cycles", value: cyclesFile.text().trim() || "—" },
-            { key: "Charge limit", value: root.startThreshold + "–" + root.endThreshold + "%" }
-        ]
-
-        RowLayout {
-            id: line
-            required property var modelData
-            Layout.fillWidth: true
-            spacing: 10
-
-            Text {
-                Layout.preferredWidth: 84
-                text: line.modelData.key
-                color: Theme.muted
-                font.family: Theme.font
-                font.pixelSize: 11
-            }
-
-            Text {
-                Layout.fillWidth: true
-                text: line.modelData.value
-                color: Theme.fg
-                font.family: Theme.fontMono
-                font.pixelSize: 11
-            }
-        }
-    }
-
-    Rectangle { Layout.fillWidth: true; height: 1; color: Qt.alpha(Theme.glow, 0.2) }
-
-    // ---------- seuil de fin de charge
-    Text {
-        text: "Stop charging at " + root.endThreshold + "%"
-        color: Theme.muted
-        font.family: Theme.font
-        font.pixelSize: 11
-    }
-
-    RowLayout {
-        Layout.fillWidth: true
-        spacing: 8
-
-        Slider {
-            Layout.fillWidth: true
-            maximum: 100
-            value: root.endThreshold
-            // Arrondi a 5 : le firmware ThinkPad n'a pas la finesse du
-            // pixel, et viser 73 % n'a aucun sens pratique.
-            onMoved: v => root.write(endFile, Math.max(40, Math.round(v / 5) * 5))
-        }
-
-        PanelButton {
-            text: "80%"
-            onActivated: root.write(endFile, 80)
-        }
-
-        PanelButton {
-            text: "100%"
-            onActivated: root.write(endFile, 100)
-        }
-    }
-
-    // ---------- mode de charge
-    Text {
-        text: "Charge behaviour"
-        color: Theme.muted
-        font.family: Theme.font
-        font.pixelSize: 11
-    }
-
-    RowLayout {
-        Layout.fillWidth: true
-        spacing: 6
+        Layout.alignment: Qt.AlignHCenter
+        spacing: 18
 
         Repeater {
             model: [
-                { id: "auto", label: "Auto" },
-                { id: "inhibit-charge", label: "Pause" },
-                { id: "force-discharge", label: "Discharge" }
+                { glyph: "󰌪", value: PowerProfile.PowerSaver, name: "Power saver" },
+                { glyph: "󰗑", value: PowerProfile.Balanced, name: "Balanced" },
+                { glyph: "󰉁", value: PowerProfile.Performance, name: "Performance" }
             ]
 
             Rectangle {
-                id: mode
+                id: profile
                 required property var modelData
-                readonly property bool current: root.behaviour === mode.modelData.id
+                readonly property bool current: PowerProfiles.profile === profile.modelData.value
+                // certaines machines n'ont pas de mode performance
+                readonly property bool available: profile.modelData.value !== PowerProfile.Performance
+                    || PowerProfiles.hasPerformanceProfile
 
-                implicitWidth: modeLabel.implicitWidth + 18
-                implicitHeight: 22
-                radius: Config.rounded ? 11 : 4
-                color: mode.current ? Qt.alpha(Theme.glow, 0.22)
-                    : modeHover.hovered ? Qt.alpha(Theme.glow, 0.1)
+                implicitWidth: 44
+                implicitHeight: 44
+                radius: Config.rounded ? width / 2 : 6
+                color: profile.current ? Qt.alpha(Theme.glow, 0.22)
+                    : profileHover.hovered && profile.available ? Qt.alpha(Theme.glow, 0.1)
                     : "transparent"
-                border.color: Qt.alpha(Theme.glow, 0.3)
-                border.width: 1
+                border.color: profile.current ? Theme.accent : Qt.alpha(Theme.glow, 0.3)
+                border.width: profile.current ? 2 : 1
+                opacity: profile.available ? 1 : 0.35
 
-                HoverHandler { id: modeHover }
-                TapHandler { onTapped: root.write(behaviourFile, mode.modelData.id) }
+                Behavior on color { ColorAnimation { duration: 120 } }
+
+                HoverHandler { id: profileHover; enabled: profile.available }
+                TapHandler {
+                    enabled: profile.available
+                    onTapped: PowerProfiles.profile = profile.modelData.value
+                }
 
                 Text {
-                    id: modeLabel
                     anchors.centerIn: parent
-                    text: mode.modelData.label
-                    color: mode.current ? Theme.fg : Theme.muted
+                    text: profile.modelData.glyph
+                    color: profile.current ? Theme.fg : Theme.muted
                     font.family: Theme.font
-                    font.pixelSize: 11
+                    font.pixelSize: 20
                 }
             }
         }
+    }
+
+    // ---------- jauge : une batterie dessinee, borne a gauche
+    RowLayout {
+        Layout.alignment: Qt.AlignHCenter
+        spacing: 0
+
+        // la borne, plus petite que le corps
+        Rectangle {
+            implicitWidth: 7
+            implicitHeight: 22
+            topLeftRadius: 3
+            bottomLeftRadius: 3
+            color: Qt.alpha(Theme.glow, 0.5)
+        }
+
+        Rectangle {
+            id: body
+            implicitWidth: 210
+            implicitHeight: 54
+            radius: Config.rounded ? 8 : 0
+            color: "transparent"
+            border.color: Qt.alpha(Theme.glow, 0.5)
+            border.width: 2
+
+            // le remplissage suit le niveau reel
+            Rectangle {
+                anchors.left: parent.left
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.leftMargin: 4
+                width: Math.max(0, (body.width - 8) * root.percentage)
+                height: body.height - 8
+                radius: Config.rounded ? 5 : 0
+                color: root.charging ? Theme.special
+                    : root.percentage <= 0.2 ? Theme.danger
+                    : Theme.accent
+                opacity: 0.85
+
+                Behavior on width { NumberAnimation { duration: 400; easing.type: Easing.OutCubic } }
+                Behavior on color { ColorAnimation { duration: 200 } }
+            }
+
+            // Le pourcentage est ecrit PAR-DESSUS le remplissage, en couleur
+            // du fond : sur la partie pleine il se detache en negatif, sur la
+            // partie vide il resterait invisible. On le laisse donc sur le
+            // fond sombre, qui contraste avec les deux.
+            Text {
+                anchors.centerIn: parent
+                text: Math.round(root.percentage * 100) + "%"
+                color: Theme.overlay
+                font.family: Theme.fontMono
+                font.pixelSize: 26
+            }
+        }
+    }
+
+    // ---------- autonomie
+    Text {
+        Layout.alignment: Qt.AlignHCenter
+        text: {
+            if (!root.remaining)
+                return root.charging ? "Charging..." : ""
+            return root.charging ? "Charging... " + root.remaining + " left"
+                : root.remaining + " left"
+        }
+        color: Theme.muted
+        font.family: Theme.font
+        font.pixelSize: 12
     }
 }

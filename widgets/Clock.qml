@@ -13,9 +13,6 @@ ColumnLayout {
 
     spacing: -3
 
-    // suit la locale systeme, comme le reste des infobulles
-    readonly property string details: Qt.locale().toString(clock.date, "dddd d MMMM yyyy")
-
     SystemClock {
         id: clock
         precision: SystemClock.Minutes

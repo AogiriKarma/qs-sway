@@ -22,24 +22,6 @@ ColumnLayout {
     readonly property string icon: charging ? "󰂄"
         : levels[Math.min(9, Math.floor(device.percentage * 10))]
 
-    // secondes -> "2 h 05" ou "45 min" ; "" si UPower ne sait pas encore
-    function formatDuration(seconds) {
-        if (!seconds || seconds <= 0)
-            return ""
-        const h = Math.floor(seconds / 3600)
-        const m = Math.round((seconds % 3600) / 60)
-        return h > 0 ? h + " h " + String(m).padStart(2, "0") : m + " min"
-    }
-
-    readonly property string details: {
-        const pct = Math.round(root.device.percentage * 100) + " %"
-        const state = root.charging ? "charging" : (root.full ? "charged" : "on battery")
-        // UPower ne renseigne le temps restant qu'une fois le debit stabilise
-        const left = root.formatDuration(root.charging ? root.device.timeToFull : root.device.timeToEmpty)
-        const suffix = left ? "\n" + (root.charging ? "Full in " : "Remaining ") + left : ""
-        return "Battery " + pct + " \u2014 " + state + suffix
-    }
-
     readonly property color tint: charging ? Theme.special
         : low  ? Theme.danger
         : full ? Theme.glow

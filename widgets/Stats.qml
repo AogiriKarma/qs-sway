@@ -50,23 +50,16 @@ Grid {
 
     // glyph: true -> la ligne du haut est un glyphe, donc en grand
     readonly property var definitions: ({
-        "cpu":  { top: "󰍛",  bottom: root.percent(SysStats.cpuUsage), glyph: true,
-                  tip: "CPU " + root.percent(SysStats.cpuUsage) },
-        "temp": { top: "󰔏", bottom: Math.round(SysStats.cpuTemp) + "\u00b0", glyph: true,
-                  tip: "CPU temperature\n" + SysStats.cpuTemp.toFixed(1) + " \u00b0C" },
-        "ram":  { top: "󰘚",  bottom: root.percent(SysStats.memUsage), glyph: true,
-                  tip: "Memory\n" + root.humanBytes(SysStats.memUsedBytes) + " / " + root.humanBytes(SysStats.memTotalBytes) },
-        "swap": { top: "󰌢", bottom: root.percent(SysStats.swapUsage), glyph: true,
-                  tip: "Swap " + root.percent(SysStats.swapUsage) },
-        "disk": { top: "󰋊", bottom: root.percent(SysStats.diskUsage), glyph: true,
-                  tip: "Root filesystem\n" + root.humanBytes(SysStats.diskUsedBytes) + " / " + root.humanBytes(SysStats.diskTotalBytes) },
-        "load": { top: "󰓅", bottom: root.percent(SysStats.load / SysStats.cores), glyph: true,
-                  tip: "1 minute load average\n" + SysStats.load.toFixed(2) + " of " + SysStats.cores + " cores" },
+        "cpu":  { top: "󰍛",  bottom: root.percent(SysStats.cpuUsage), glyph: true },
+        "temp": { top: "󰔏", bottom: Math.round(SysStats.cpuTemp) + "\u00b0", glyph: true },
+        "ram":  { top: "󰘚",  bottom: root.percent(SysStats.memUsage), glyph: true },
+        "swap": { top: "󰌢", bottom: root.percent(SysStats.swapUsage), glyph: true },
+        "disk": { top: "󰋊", bottom: root.percent(SysStats.diskUsage), glyph: true },
+        "load": { top: "󰓅", bottom: root.percent(SysStats.load / SysStats.cores), glyph: true },
         "net":  {
             top: "\u2193" + root.humanize(SysStats.rxRate),
             bottom: "\u2191" + root.humanize(SysStats.txRate),
-            glyph: false,
-                  tip: "Network\nDown " + root.humanize(SysStats.rxRate) + "/s\nUp " + root.humanize(SysStats.txRate) + "/s"
+            glyph: false
         }
     })
 
@@ -83,7 +76,6 @@ Grid {
             readonly property var def: root.definitions[entry.modelData]
             // le fond de survol deborde moins ici : les entrees sont voisines
             padding: 4
-            tooltip: entry.def.tip ?? ""
 
         ColumnLayout {
             spacing: entry.def.glyph ? -root.size * 0.25 : -root.labelSize * 0.3

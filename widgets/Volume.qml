@@ -27,13 +27,6 @@ Item {
         ? "󰖁"
         : levels[Math.min(2, Math.floor(volume * 3))]
 
-    readonly property string details: {
-        if (!root.audio)
-            return ""
-        const name = root.sink?.description || root.sink?.nickname || root.sink?.name || "Audio output"
-        return name + "\n" + Math.round(root.volume * 100) + " %" + (root.muted ? " \u2014 muted" : "")
-    }
-
     readonly property color tint: muted ? Theme.dim : Theme.fg
 
     // sans sink (aucune sortie audio), le widget disparait entierement
@@ -73,8 +66,10 @@ Item {
 
     MouseArea {
         anchors.fill: parent
-        acceptedButtons: Qt.LeftButton
-
+        // Le clic gauche appartient desormais au panneau : c'est lui qui
+        // ouvre le mixer. Le mute passe au bouton du milieu, la molette
+        // continue de regler le volume.
+        acceptedButtons: Qt.MiddleButton
         onClicked: if (root.audio) root.audio.muted = !root.audio.muted
 
         onWheel: event => {
