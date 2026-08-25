@@ -41,6 +41,8 @@ Variants {
 
             // --- utilisateur : a gauche, ou en haut
             Pill {
+                id: userPill
+
                 anchors.left: bar.vertical ? undefined : parent.left
                 anchors.top: bar.vertical ? parent.top : undefined
                 anchors.horizontalCenter: bar.vertical ? parent.horizontalCenter : undefined
@@ -51,6 +53,26 @@ Variants {
                 User {
                     anchors.centerIn: parent
                     size: Config.barSize * (bar.vertical ? 0.45 : 0.34)
+                }
+            }
+
+            // --- statistiques systeme, contre la bulle utilisateur
+            Pill {
+                id: statsPill
+
+                anchors.left: bar.vertical ? undefined : userPill.right
+                anchors.leftMargin: bar.vertical ? 0 : 8
+                anchors.top: bar.vertical ? userPill.bottom : undefined
+                anchors.topMargin: bar.vertical ? 8 : 0
+                anchors.horizontalCenter: bar.vertical ? parent.horizontalCenter : undefined
+                anchors.verticalCenter: bar.vertical ? undefined : parent.verticalCenter
+                width: bar.vertical ? bar.pillThickness : implicitWidth
+                height: bar.vertical ? implicitHeight : bar.pillThickness
+
+                Stats {
+                    anchors.centerIn: parent
+                    labelSize: bar.labelSize
+                    size: Config.barSize * 0.22
                 }
             }
 
@@ -80,12 +102,16 @@ Variants {
                 Grid {
                     anchors.centerIn: parent
                     spacing: 14
-                    columns: bar.vertical ? 1 : 3
+                    columns: bar.vertical ? 1 : 4
                     horizontalItemAlignment: Grid.AlignHCenter
-                    // ces widgets ont tous deux lignes : ils s'alignent par
-                    // le bas pour partager la meme ligne de base
-                    verticalItemAlignment: bar.vertical ? Grid.AlignVCenter : Grid.AlignBottom
+                    // centre plutot qu'aligne par le bas : les widgets n'ont
+                    // plus tous la meme hauteur depuis que le reseau met ses
+                    // deux debits a cote du glyphe
+                    verticalItemAlignment: Grid.AlignVCenter
 
+                    Network {
+                        size: Config.barSize * 0.2
+                    }
                     Volume {
                         labelSize: bar.labelSize
                         size: Config.barSize * 0.2

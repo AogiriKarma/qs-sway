@@ -1,0 +1,96 @@
+import QtQuick
+import QtQuick.Layouts
+import qs.services
+
+// Statistiques systeme. Chaque entree occupe deux lignes : soit un glyphe
+// au-dessus de sa valeur, comme Volume et Battery, soit deux valeurs pour
+// le reseau, dont les deux sens n'auraient aucun sens separes.
+//
+// La liste et l'ordre viennent de Config.stats — le widget ne decide pas
+// de ce qui merite d'etre montre.
+Grid {
+    id: root
+
+    property int size: 16
+    property real labelSize: size * 0.75
+
+    columns: Config.vertical ? 1 : root.entries.length
+    // meme respiration qu'entre les widgets de la bulle systeme
+    spacing: 14
+    // Le bloc reseau fait deux petites lignes la ou les autres ont un gros
+    // glyphe : sans alignement explicite, Grid les cale par le haut et le
+    // reseau flotte au-dessus des pourcentages.
+    horizontalItemAlignment: Grid.AlignHCenter
+    verticalItemAlignment: Grid.AlignVCenter
+
+    // 1,2M / 340k / 12 — une decimale sous 10 pour que la largeur du texte
+    // ne saute pas a chaque echantillon
+    function humanize(bytesPerSec) {
+        if (bytesPerSec < 1000)
+            return Math.round(bytesPerSec) + ""
+        if (bytesPerSec < 1000000) {
+            const k = bytesPerSec / 1000
+            return (k < 10 ? k.toFixed(1) : Math.round(k)) + "k"
+        }
+        const m = bytesPerSec / 1000000
+        return (m < 10 ? m.toFixed(1) : Math.round(m)) + "M"
+    }
+
+    function percent(ratio) {
+        return Math.round(ratio * 100) + "%"
+    }
+
+    // glyph: true -> la ligne du haut est un glyphe, donc en grand
+    readonly property var definitions: ({
+        "cpu":  { top: "󰍛",  bottom: root.percent(SysStats.cpuUsage), glyph: true },
+        "temp": { top: "󰔏", bottom: Math.round(SysStats.cpuTemp) + "\u00b0", glyph: true },
+        "ram":  { top: "󰘚",  bottom: root.percent(SysStats.memUsage), glyph: true },
+        "swap": { top: "󰌢", bottom: root.percent(SysStats.swapUsage), glyph: true },
+        "disk": { top: "󰋊", bottom: root.percent(SysStats.diskUsage), glyph: true },
+        "load": { top: "󰓅", bottom: SysStats.load.toFixed(1), glyph: true },
+        "net":  {
+            top: "\u2193" + root.humanize(SysStats.rxRate),
+            bottom: "\u2191" + root.humanize(SysStats.txRate),
+            glyph: false
+        }
+    })
+
+    // une entree inconnue dans le JSON est ignoree plutot que d'afficher
+    // un trou ou de casser le widget
+    readonly property var entries: (Config.stats ?? []).filter(k => root.definitions[k] !== undefined)
+
+    Repeater {
+        model: root.entries
+
+        ColumnLayout {
+            id: entry
+            required property string modelData
+            readonly property var def: root.definitions[entry.modelData]
+
+            spacing: entry.def.glyph ? -root.size * 0.25 : -root.labelSize * 0.3
+
+            Text {
+                Layout.alignment: Qt.AlignHCenter
+                // largeur figee sur les seules valeurs variables : un debit
+                // passe de "378" a "1.2M", un pourcentage plafonne a quatre
+                // caracteres et se dimensionne tout seul
+                Layout.preferredWidth: entry.def.glyph ? -1 : root.labelSize * 2.8
+                horizontalAlignment: Text.AlignLeft
+                text: entry.def.top
+                font.family: entry.def.glyph ? Theme.font : Theme.fontMono
+                font.pixelSize: entry.def.glyph ? root.size * 1.25 : root.labelSize
+                color: Theme.fg
+            }
+
+            Text {
+                Layout.alignment: Qt.AlignHCenter
+                Layout.preferredWidth: entry.def.glyph ? -1 : root.labelSize * 2.8
+                horizontalAlignment: Text.AlignLeft
+                text: entry.def.bottom
+                font.family: Theme.fontMono
+                font.pixelSize: root.labelSize
+                color: Theme.fg
+            }
+        }
+    }
+}

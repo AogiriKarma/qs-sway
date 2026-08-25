@@ -1,6 +1,8 @@
 Battery 1.0 Battery.qml
 Clock 1.0 Clock.qml
+Network 1.0 Network.qml
 Pill 1.0 Pill.qml
+Stats 1.0 Stats.qml
 Tray 1.0 Tray.qml
 TrayMenu 1.0 TrayMenu.qml
 User 1.0 User.qml

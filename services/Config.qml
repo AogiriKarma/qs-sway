@@ -21,6 +21,7 @@ Singleton {
     readonly property alias rounded: adapter.rounded
     readonly property alias barEdge: adapter.barEdge
     readonly property alias barSize: adapter.barSize
+    readonly property alias stats: adapter.stats
 
     // derive, donc absent du fichier : une seule source de verite
     readonly property bool vertical: adapter.barEdge === "left"
@@ -58,6 +59,11 @@ Singleton {
             // Epaisseur de la barre : hauteur si horizontale, largeur si
             // verticale. Toutes les tailles de widgets en derivent.
             property int barSize: 80
+
+            // Statistiques affichees, dans l'ordre. Valeurs reconnues :
+            // "cpu", "temp", "ram", "swap", "disk", "load", "net".
+            // Retirer une entree la fait disparaitre de la barre.
+            property var stats: ["cpu", "temp", "ram", "disk", "net"]
         }
     }
 }
