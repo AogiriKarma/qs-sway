@@ -22,7 +22,6 @@ Singleton {
     readonly property alias barEdge: adapter.barEdge
     readonly property alias barSize: adapter.barSize
     readonly property alias stats: adapter.stats
-    readonly property alias panelWidth: adapter.panelWidth
 
     // derive, donc absent du fichier : une seule source de verite
     readonly property bool vertical: adapter.barEdge === "left"
@@ -60,11 +59,6 @@ Singleton {
             // Epaisseur de la barre : hauteur si horizontale, largeur si
             // verticale. Toutes les tailles de widgets en derivent.
             property int barSize: 80
-
-            // Largeur des panneaux de la bulle d'etat. Commune a toutes les
-            // pages : sans elle, passer du calendrier au bluetooth ferait
-            // sauter la largeur de la bulle a chaque changement.
-            property int panelWidth: 300
 
             // Statistiques affichees, dans l'ordre. Valeurs reconnues :
             // "cpu", "temp", "ram", "swap", "disk", "load", "net".

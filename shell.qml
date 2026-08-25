@@ -204,8 +204,13 @@ Variants {
                         // largeur plancher quand une page est ouverte : une
                         // liste defilante ne propage pas la largeur de son
                         // contenu, et le panneau se retrouverait etrique
-                        implicitWidth: Math.max(statusRow.implicitWidth,
-                            bar.panel === "" ? 0 : Config.panelWidth)
+                        // Les pages sont un peu plus larges que la rangee de
+                        // widgets : assez pour respirer, pas assez pour que
+                        // la bulle paraisse changer de nature en s'ouvrant.
+                        readonly property real pageWidth: statusRow.implicitWidth + 60
+
+                        implicitWidth: bar.panel === "" ? statusRow.implicitWidth
+                            : statusContent.pageWidth
                         implicitHeight: (bar.pillThickness - statusPill.padding * 2)
                             + (panelLoader.item ? panelLoader.item.implicitHeight + 25 : 0)
                         anchors.top: parent.top
@@ -286,9 +291,7 @@ Variants {
                             anchors.top: panelRule.bottom
                             anchors.topMargin: 12
                             anchors.horizontalCenter: parent.horizontalCenter
-                            // largeur imposee : les pages s'y adaptent, ce qui
-                            // garde une bulle de largeur constante
-                            width: Config.panelWidth
+                            width: statusContent.pageWidth
                             // charge par URL : les pages n'ont pas a etre
                             // declarees dans le qmldir
                             source: bar.panel ? "widgets/panels/" + bar.panel + ".qml" : ""
