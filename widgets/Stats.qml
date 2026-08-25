@@ -62,11 +62,14 @@ Grid {
     Repeater {
         model: root.entries
 
-        ColumnLayout {
+        Hoverable {
             id: entry
             required property string modelData
             readonly property var def: root.definitions[entry.modelData]
+            // le fond de survol deborde moins ici : les entrees sont voisines
+            padding: 4
 
+        ColumnLayout {
             spacing: entry.def.glyph ? -root.size * 0.25 : -root.labelSize * 0.3
 
             Text {
@@ -91,6 +94,7 @@ Grid {
                 font.pixelSize: root.labelSize
                 color: Theme.fg
             }
+        }
         }
     }
 }

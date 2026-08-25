@@ -50,9 +50,12 @@ Variants {
                 width: bar.vertical ? bar.pillThickness : implicitWidth
                 height: bar.vertical ? implicitHeight : bar.pillThickness
 
-                User {
+                Hoverable {
                     anchors.centerIn: parent
-                    size: Config.barSize * (bar.vertical ? 0.45 : 0.34)
+
+                    User {
+                        size: Config.barSize * (bar.vertical ? 0.45 : 0.34)
+                    }
                 }
             }
 
@@ -102,27 +105,40 @@ Variants {
                 Grid {
                     anchors.centerIn: parent
                     spacing: 14
-                    columns: bar.vertical ? 1 : 4
+                    columns: bar.vertical ? 1 : 5
                     horizontalItemAlignment: Grid.AlignHCenter
                     // centre plutot qu'aligne par le bas : les widgets n'ont
                     // plus tous la meme hauteur depuis que le reseau met ses
                     // deux debits a cote du glyphe
                     verticalItemAlignment: Grid.AlignVCenter
 
-                    Network {
-                        size: Config.barSize * 0.2
+                    Hoverable {
+                        Network {
+                            size: Config.barSize * 0.2
+                        }
                     }
-                    Volume {
-                        labelSize: bar.labelSize
-                        size: Config.barSize * 0.2
+                    Hoverable {
+                        Bluetooth {
+                            size: Config.barSize * 0.2
+                        }
                     }
-                    Battery {
-                        labelSize: bar.labelSize
-                        size: Config.barSize * 0.25
+                    Hoverable {
+                        Volume {
+                            labelSize: bar.labelSize
+                            size: Config.barSize * 0.2
+                        }
                     }
-                    Clock {
-                        labelSize: bar.labelSize
-                        size: Config.barSize * 0.28
+                    Hoverable {
+                        Battery {
+                            labelSize: bar.labelSize
+                            size: Config.barSize * 0.25
+                        }
+                    }
+                    Hoverable {
+                        Clock {
+                            labelSize: bar.labelSize
+                            size: Config.barSize * 0.28
+                        }
                     }
                 }
             }
