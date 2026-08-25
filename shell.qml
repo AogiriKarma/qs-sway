@@ -64,8 +64,10 @@ Variants {
                 Workspaces { screen: bar.screen }
             }
 
-            // --- etat systeme : a droite, ou en bas
+            // --- etat systeme : permanent, a droite ou en bas
             Pill {
+                id: statusPill
+
                 anchors.right: bar.vertical ? undefined : parent.right
                 anchors.bottom: bar.vertical ? parent.bottom : undefined
                 anchors.horizontalCenter: bar.vertical ? parent.horizontalCenter : undefined
@@ -78,16 +80,12 @@ Variants {
                 Grid {
                     anchors.centerIn: parent
                     spacing: 14
-                    columns: bar.vertical ? 1 : 4
+                    columns: bar.vertical ? 1 : 3
                     horizontalItemAlignment: Grid.AlignHCenter
-                    // en horizontal les widgets empiles partagent leur ligne
-                    // de base : ils s'alignent par le bas, pas par le milieu
+                    // ces widgets ont tous deux lignes : ils s'alignent par
+                    // le bas pour partager la meme ligne de base
                     verticalItemAlignment: bar.vertical ? Grid.AlignVCenter : Grid.AlignBottom
 
-                    Tray {
-                        size: Config.barSize * 0.22
-                        window: bar
-                    }
                     Volume {
                         labelSize: bar.labelSize
                         size: Config.barSize * 0.2
@@ -100,6 +98,33 @@ Variants {
                         labelSize: bar.labelSize
                         size: Config.barSize * 0.28
                     }
+                }
+            }
+
+            // --- tray : transitoire, dans sa propre bulle avant l'etat
+            // systeme. Separe parce que son contenu va et vient avec les
+            // applis, et qu'il n'a qu'une ligne la ou les autres en ont deux.
+            Pill {
+                id: trayPill
+
+                // pas d'item en tray : la bulle disparait au lieu de
+                // laisser une capsule vide flotter dans la barre
+                visible: trayWidget.visible
+
+                anchors.right: bar.vertical ? undefined : statusPill.left
+                anchors.rightMargin: bar.vertical ? 0 : 8
+                anchors.bottom: bar.vertical ? statusPill.top : undefined
+                anchors.bottomMargin: bar.vertical ? 8 : 0
+                anchors.horizontalCenter: bar.vertical ? parent.horizontalCenter : undefined
+                anchors.verticalCenter: bar.vertical ? undefined : parent.verticalCenter
+                width: bar.vertical ? bar.pillThickness : implicitWidth
+                height: bar.vertical ? implicitHeight : bar.pillThickness
+
+                Tray {
+                    id: trayWidget
+                    anchors.centerIn: parent
+                    size: Config.barSize * 0.22
+                    window: bar
                 }
             }
         }
