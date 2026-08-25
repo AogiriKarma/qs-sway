@@ -10,7 +10,11 @@ Rectangle {
     readonly property bool vertical: Config.vertical
 
     color: Theme.surface
-    radius: Config.rounded ? (root.vertical ? width : height) / 2 : 0
+    // Le plafond compte : une bulle qui s'etend en panneau garderait sinon
+    // un rayon de height/2, donc une ellipse geante dont le fond ne couvre
+    // plus les coins du contenu. Plafonne, la capsule devient un rectangle
+    // arrondi en grandissant — c'est exactement le morphing voulu.
+    radius: Config.rounded ? Math.min((root.vertical ? width : height) / 2, 22) : 0
     border.color: Qt.alpha(Theme.glow, 0.3)
     border.width: 1
 
