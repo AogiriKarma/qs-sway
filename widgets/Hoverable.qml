@@ -14,6 +14,8 @@ Item {
     // debordement du fond au-dela du contenu
     property int padding: 6
     property bool interactive: true
+    // texte affiche au survol apres un court delai ; vide = pas d'infobulle
+    property string tooltip: ""
 
     signal clicked(var event)
 
@@ -34,6 +36,29 @@ Item {
     Item {
         id: inner
         anchors.fill: parent
+    }
+
+    // Le delai evite qu'une infobulle clignote quand la souris traverse la
+    // barre pour aller ailleurs. Elle ne s'affiche que si on s'arrete.
+    Timer {
+        id: delay
+        interval: 400
+        onTriggered: tip.visible = root.tooltip !== ""
+    }
+
+    onHoveredChanged: {
+        if (root.hovered && root.tooltip !== "") {
+            delay.restart()
+        } else {
+            delay.stop()
+            tip.visible = false
+        }
+    }
+
+    Tooltip {
+        id: tip
+        text: root.tooltip
+        anchorItem: root
     }
 
     HoverHandler {

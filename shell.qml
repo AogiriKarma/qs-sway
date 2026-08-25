@@ -52,8 +52,10 @@ Variants {
 
                 Hoverable {
                     anchors.centerIn: parent
+                    tooltip: userWidget.details
 
                     User {
+                        id: userWidget
                         size: Config.barSize * (bar.vertical ? 0.45 : 0.34)
                     }
                 }
@@ -113,29 +115,44 @@ Variants {
                     verticalItemAlignment: Grid.AlignVCenter
 
                     Hoverable {
+                        tooltip: networkWidget.details
+
                         Network {
+                            id: networkWidget
                             size: Config.barSize * 0.2
                         }
                     }
                     Hoverable {
+                        tooltip: bluetoothWidget.details
+
                         Bluetooth {
+                            id: bluetoothWidget
                             size: Config.barSize * 0.2
                         }
                     }
                     Hoverable {
+                        tooltip: volumeWidget.details
+
                         Volume {
+                            id: volumeWidget
                             labelSize: bar.labelSize
                             size: Config.barSize * 0.2
                         }
                     }
                     Hoverable {
+                        tooltip: batteryWidget.details
+
                         Battery {
+                            id: batteryWidget
                             labelSize: bar.labelSize
                             size: Config.barSize * 0.25
                         }
                     }
                     Hoverable {
+                        tooltip: clockWidget.details
+
                         Clock {
+                            id: clockWidget
                             labelSize: bar.labelSize
                             size: Config.barSize * 0.28
                         }

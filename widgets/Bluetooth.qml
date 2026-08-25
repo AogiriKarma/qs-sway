@@ -21,6 +21,20 @@ Text {
     readonly property var connectedDevices: root.devices.filter(d => d.connected)
     readonly property bool connected: root.connectedDevices.length > 0
 
+    readonly property string details: {
+        if (!root.adapter)
+            return ""
+        if (!root.enabled)
+            return "Bluetooth off"
+        if (!root.connected)
+            return "Bluetooth on\nNo device connected"
+        // le module expose le niveau de batterie des peripheriques, quand
+        // ils le rapportent : c'est l'interet principal de l'infobulle
+        return root.connectedDevices.map(d =>
+            d.deviceName + (d.batteryAvailable ? " \u2014 " + Math.round(d.battery * 100) + " %" : "")
+        ).join("\n")
+    }
+
     visible: root.adapter !== null
 
     text: !root.enabled  ? "󰂲"

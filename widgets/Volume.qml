@@ -27,6 +27,13 @@ Item {
         ? "󰖁"
         : levels[Math.min(2, Math.floor(volume * 3))]
 
+    readonly property string details: {
+        if (!root.audio)
+            return ""
+        const name = root.sink?.description || root.sink?.nickname || root.sink?.name || "Audio output"
+        return name + "\n" + Math.round(root.volume * 100) + " %" + (root.muted ? " \u2014 muted" : "")
+    }
+
     readonly property color tint: muted ? Theme.dim : Theme.fg
 
     // sans sink (aucune sortie audio), le widget disparait entierement

@@ -27,6 +27,16 @@ Text {
     // glyphes nerd font md-wifi, du plus faible au plus fort
     readonly property var levels: ["󰤟", "󰤢", "󰤥", "󰤨"]
 
+    readonly property string details: {
+        if (root.onWired) {
+            const speed = root.wiredDevice?.linkSpeed ?? 0
+            return "Ethernet" + (speed > 0 ? "\n" + speed + " Mb/s" : "")
+        }
+        if (root.wifiNetwork)
+            return root.wifiNetwork.name + "\nSignal " + Math.round(root.strength * 100) + " %"
+        return Networking.wifiEnabled ? "Wi-Fi on\nNot connected" : "Wi-Fi off"
+    }
+
     // aucune interface reseau du tout (VM, conteneur) : le widget disparait
     visible: root.devices.length > 0
 

@@ -27,9 +27,13 @@ Singleton {
     property real cpuTemp: 0
     // remplissage de la racine, en 0-1
     property real diskUsage: 0
+    property real diskUsedBytes: 0
+    property real diskTotalBytes: 0
     property real swapUsage: 0
-    // charge moyenne 1 minute, rapportee au nombre de coeurs
+    // charge moyenne sur 1 minute : nombre moyen de processus qui veulent
+    // tourner. Ne se lit que rapportee au nombre de coeurs, d'ou `cores`.
     property real load: 0
+    property int cores: 1
 
     readonly property int interval: 2000
 
@@ -87,8 +91,11 @@ Singleton {
         stdout: StdioCollector {
             onStreamFinished: {
                 const nums = text.trim().split("\n").pop().trim().split(/\s+/).map(Number)
-                if (nums.length >= 2 && nums[0] > 0)
+                if (nums.length >= 2 && nums[0] > 0) {
+                    root.diskTotalBytes = nums[0]
+                    root.diskUsedBytes = nums[1]
                     root.diskUsage = nums[1] / nums[0]
+                }
             }
         }
     }
@@ -118,8 +125,14 @@ Singleton {
     }
 
     function sampleCpu() {
+        const lines = statFile.text().split("\n")
+        // les lignes "cpu0", "cpu1"... donnent le nombre de coeurs, sans
+        // avoir a lire /proc/cpuinfo ni lancer nproc
+        const cores = lines.filter(l => /^cpu\d/.test(l)).length
+        if (cores > 0)
+            root.cores = cores
         // premiere ligne de /proc/stat : "cpu  user nice system idle iowait ..."
-        const line = statFile.text().split("\n")[0]
+        const line = lines[0]
         const parts = line.trim().split(/\s+/).slice(1).map(Number)
         if (parts.length < 5 || parts.some(isNaN))
             return
